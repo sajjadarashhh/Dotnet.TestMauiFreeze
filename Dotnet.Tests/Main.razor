@@ -1,0 +1,48 @@
+﻿@using Blazored.LocalStorage
+@using Pooyan.test.infrastructure.StatesBase
+@using Pooyan.test.project.StateManagement
+@using Pooyan.test.project.StateManagement.StateManagerExtensions
+<Router AppAssembly="@typeof(Main).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    [Inject]
+    public IServiceProvider ServiceProvider { get; set; }
+    [Inject]
+    public ILocalStorageService localStorage { get; set; }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (StateBaseExtensions.HandleProblems)
+        {
+            StateContext.ConfigurationFreeezeProblem(ServiceProvider.GetRequiredService<ILocalStorageService>());
+            await InvokeAsync(async () =>
+            {
+                await ServiceProvider.GetRequiredService<StateContext>().Initialize(ServiceProvider);
+            });
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!StateBaseExtensions.HandleProblems)
+        {
+            if (StateBaseExtensions.IsFreezeException)
+            {
+                StateContext.ConfigurationFreeezeProblem(localStorage);
+            }
+            var context = ServiceProvider.GetRequiredService<StateContext>();
+        }
+    }
+}
