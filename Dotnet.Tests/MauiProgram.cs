@@ -1,7 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using Dotnet.Tests.Data;
-using Pooyan.test.project.StateManagement;
-using Pooyan.test.project.StateManagement.StateManagerExtensions;
 
 namespace Dotnet.Tests
 {
@@ -22,17 +20,36 @@ namespace Dotnet.Tests
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-            //you can see Freeze Problem and Null refrence Exception within this variable
-            StateBaseExtensions.IsFreezeException = true;
-            //we can solve problem with some hacks but this is not Clean and true to use in our Applications written in WASM we cant to switch all configurations to this...
-            StateBaseExtensions.HandleProblems = false;
+
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddSingleton<WeatherForecastService>();
-            if (!StateBaseExtensions.IsFreezeException)
-                StateContext.ConfigurationNullRefrenceExceptions(builder.Services.BuildServiceProvider());
-            builder.Services.AddSingleton<StateContext>();
+            builder.Services.AddSingleton<StateManager>(a => new StateManager(a.GetRequiredService<ILocalStorageService>()));
 
             return builder.Build();
         }
+    }
+}
+public class StateBaseExtensions
+{
+    //you can see Freeze Problem and Null refrence Exception within this variable
+    public static bool IsFreezeException = false;
+    //we can solve problem with some hacks but this is not Clean and true to use in our Applications written in WASM we cant to switch all configurations to this...
+    public static bool HandleProblems = false;
+}
+public class StateManager
+{
+    public string UserState { get; set; }
+    public StateManager(ILocalStorageService localStorageService)
+    {
+        if (!StateBaseExtensions.IsFreezeException)
+            UserState = localStorageService.GetItemAsStringAsync("User").Result;//we need to get items in constructor! we can to get them in another way but best practices has exception and we cant use best architectures
+    }
+    public StateManager()
+    {
+
+    }
+    public async Task Initialize(ILocalStorageService localStorageService)
+    {
+        UserState = await localStorageService.GetItemAsStringAsync("User");
     }
 }

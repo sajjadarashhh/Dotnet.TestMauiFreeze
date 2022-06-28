@@ -1,7 +1,4 @@
 ﻿@using Blazored.LocalStorage
-@using Pooyan.test.infrastructure.StatesBase
-@using Pooyan.test.project.StateManagement
-@using Pooyan.test.project.StateManagement.StateManagerExtensions
 <Router AppAssembly="@typeof(Main).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -20,29 +17,19 @@
     [Inject]
     public ILocalStorageService localStorage { get; set; }
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (StateBaseExtensions.HandleProblems)
-        {
-            StateContext.ConfigurationFreeezeProblem(ServiceProvider.GetRequiredService<ILocalStorageService>());
-            await InvokeAsync(async () =>
-            {
-                await ServiceProvider.GetRequiredService<StateContext>().Initialize(ServiceProvider);
-            });
-        }
-    }
-
-
     protected override async Task OnInitializedAsync()
     {
-        if (!StateBaseExtensions.HandleProblems)
+        if (!StateBaseExtensions.HandleProblems && !StateBaseExtensions.IsFreezeException)
         {
-            if (StateBaseExtensions.IsFreezeException)
-            {
-                StateContext.ConfigurationFreeezeProblem(localStorage);
-            }
-            var context = ServiceProvider.GetRequiredService<StateContext>();
+            var context = ServiceProvider.GetRequiredService<StateManager>();
+        }
+        else if (StateBaseExtensions.HandleProblems)
+        {
+            await new StateManager().Initialize(localStorage);
+        }
+        else if (StateBaseExtensions.IsFreezeException)
+        {
+            var user = localStorage.GetItemAsStringAsync("User").Result;
         }
     }
 }
