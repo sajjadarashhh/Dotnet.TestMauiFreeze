@@ -1,10 +1,9 @@
 ﻿using Blazored.LocalStorage;
-using Dotnet.Tests.Data;
-using Microsoft.JSInterop;
+using FreezeProblem.Data;
+using Microsoft.AspNetCore.Components.WebView.Maui;
 
-namespace Dotnet.Tests
+namespace FreezeProblem
 {
-
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -19,13 +18,13 @@ namespace Dotnet.Tests
 
             builder.Services.AddMauiBlazorWebView();
 #if DEBUG
-            builder.Services.AddBlazorWebViewDeveloperTools();
+		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
-            builder.Services.AddBlazoredLocalStorage();
-            var result =  builder.Build();
-            result.Services.GetRequiredService<IJSRuntime>().InvokeVoidAsync("window.location.reload").ConfigureAwait(false).GetAwaiter().GetResult();
-            return result;
+            builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddBlazoredLocalStorage(); 
+
+            return builder.Build();
         }
     }
 }

@@ -12,24 +12,7 @@
 </Router>
 
 @code {
-    [Inject]
-    public IServiceProvider ServiceProvider { get; set; }
-    [Inject]
-    public ILocalStorageService localStorage { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        if (!StateBaseExtensions.HandleProblems && !StateBaseExtensions.IsFreezeException)
-        {
-            var context = ServiceProvider.GetRequiredService<StateManager>();
-        }
-        else if (StateBaseExtensions.HandleProblems)
-        {
-            await new StateManager().Initialize(localStorage);
-        }
-        else if (StateBaseExtensions.IsFreezeException)
-        {
-            var user = localStorage.GetItemAsStringAsync("User").Result;
-        }
     }
 }
