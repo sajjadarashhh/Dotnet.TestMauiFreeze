@@ -21,8 +21,7 @@ namespace FreezeProblem
 		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
-            builder.Services.AddSingleton<WeatherForecastService>();
-            builder.Services.AddBlazoredLocalStorage(); 
+            builder.Services.AddSingleton<WeatherForecastService>(); 
 
             return builder.Build();
         }

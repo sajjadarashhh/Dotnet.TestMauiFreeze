@@ -21,8 +21,6 @@ namespace Dotnet.Tests
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
-
-            builder.Services.AddBlazoredLocalStorage();
             var result =  builder.Build();
             result.Services.GetRequiredService<IJSRuntime>().InvokeVoidAsync("window.location.reload").ConfigureAwait(false).GetAwaiter().GetResult();
             return result;
