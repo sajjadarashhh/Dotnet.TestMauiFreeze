@@ -1,6 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using FreezeProblem.Data;
 using Microsoft.AspNetCore.Components.WebView.Maui;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 
 namespace FreezeProblem
 {

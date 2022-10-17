@@ -1,21 +1,29 @@
 ﻿<Router AppAssembly="@typeof(Main).Assembly">
-	<Found Context="routeData">
-		<RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+
+        </RouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-	</Found>
-	<NotFound>
-		<LayoutView Layout="@typeof(MainLayout)">
-			<p role="alert">Sorry, there's nothing at this address.</p>
-		</LayoutView>
-	</NotFound>
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Counter : @Count </p>
+            <button @onclick=@(()=>Count++)></button>
+        </LayoutView>
+    </NotFound>
 </Router>
 
 
 @code {
-	[Inject]
-	public IJSRuntime JsRuntime { get; set; }
-	protected override async Task OnInitializedAsync()
-	{
-		JsRuntime.InvokeVoidAsync("window.location.reload").ConfigureAwait(false).GetAwaiter().GetResult();
-	}
+
+    [Inject]
+    public IJSRuntime JsRuntime { get; set; }
+    public int Count
+    {
+        get => JsRuntime.InvokeAsync<int>("window.localStorage.getItem", "user").ConfigureAwait(false).GetAwaiter().GetResult();
+        set
+        {
+            Count = value; JsRuntime.InvokeVoidAsync("window.localStorage.setItem", "user", value).ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+    }
 }
